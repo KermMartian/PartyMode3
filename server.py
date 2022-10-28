@@ -87,8 +87,9 @@ class LEDServerHandler:
 		else:
 			# Daytime
 			half_pi = 0.5 * math.pi
-			r, g, b = sl.skyRGB(4, half_pi - sun_altitude, sun_azmith + half_pi, half_pi - sun_angle)
-			self.strip.setPixelColorRGB(i, r, g, b)
+			r, g, b = self.skylight.skyRGB(4, half_pi - sun_altitude, sun_azimuth + half_pi, half_pi - sun_altitude)
+			for i in range(0, LED_COUNT):
+				self.strip.setPixelColorRGB(i, r, g, b)
 		self.strip.show()
 
 	def modeOff(self):
@@ -113,7 +114,7 @@ class LEDServerHandler:
 				elif mode == b'0':
 					self.modeOff()
 			elif command == b'c':
-				self.color = int(str(await reader.read(6), encoding='ascii'), 16)
+				self.color = correctColor()(int(str(await reader.read(6), encoding='ascii'), 16))
 				setColor(self.strip, self.color)
 				self.strip.show()
 			else:
