@@ -7,12 +7,12 @@ import numpy as np
 import math
 
 class SkyLight:
-	ZENITH_CHROMATICITY_MATRIX_X = np.array([ \
+	ZENITH_CHROMATICITY_MATRIX_x = np.array([ \
 		[0.0017,	-0.0037,	0.0021,		0.000], \
 		[-0.0290,	0.0638,		-0.0320,	0.0039], \
 		[0.1169,	-0.2120,	0.0605,		0.2589]])
 
-	ZENITH_CHROMATICITY_MATRIX_Y = np.array([ \
+	ZENITH_CHROMATICITY_MATRIX_y = np.array([ \
 		[0.0028,	-0.0061,	0.0032,		0.000], \
 		[-0.0421,	0.0897,		-0.0415,	0.0052], \
 		[0.1535,	-0.2676,	0.0667,		0.2669]])
@@ -60,8 +60,8 @@ class SkyLight:
 	def zenithChromaticity(self, turbidity, sun_theta):
 		turbidity_row = np.array([[math.pow(turbidity, 2.0), turbidity, 1.0]])
 		sun_angle_col = np.array([[math.pow(sun_theta, 3.0)], [math.pow(sun_theta, 2.0)], [sun_theta], [1.0]])
-		return (turbidity_row @ self.ZENITH_CHROMATICITY_MATRIX_X @ sun_angle_col, \
-		        turbidity_row @ self.ZENITH_CHROMATICITY_MATRIX_Y @ sun_angle_col)
+		return (turbidity_row @ self.ZENITH_CHROMATICITY_MATRIX_x @ sun_angle_col, \
+		        turbidity_row @ self.ZENITH_CHROMATICITY_MATRIX_y @ sun_angle_col)
 
 	def skyYxy(self, turbidity, theta, gamma, sun_theta):
 		turbidity_col = np.array([[turbidity], [1.0]])
@@ -79,5 +79,5 @@ class SkyLight:
 
 	def skyRGB(self, turbidity, theta, gamma, sun_theta):
 		Y, x, y = self.skyYxy(turbidity, theta, gamma, sun_theta)
-		r, g, b = self.colorspace_converter.xy_to_rgb(x, y, Y)
+		r, g, b = self.colorspace_converter.xy_to_rgb(x, y)
 		return (r, g, b)

@@ -21,6 +21,8 @@ class LEDInterface:
             self.socket.sendall(b'mf')
         elif action == 'dim':
             self.socket.sendall(b'md')
+        elif action == 'skylight':
+            self.socket.sendall(b'ms')
         elif action == 'off':
             self.socket.sendall(b'm0')
         elif action == 'color':
@@ -74,9 +76,10 @@ class Partymode3Handler(BaseHTTPRequestHandler):
                 <button type="submit" name="action" value="christmas">Christmas</button>
                 <button type="submit" name="action" value="dim">Dim</button>
                 <button type="submit" name="action" value="full">Full</button>
+		<button type="submit" name="action" value="skylight">Sky Light</button>
+                <button type="submit" name="action" value="off">Off</button>
                 <input type="color" name="color" />
                 <button type="submit" name="action" value="color">Set Solid Color</button>
-                <button type="submit" name="action" value="off">Off</button>
             </form>
             </body>
             </html>
