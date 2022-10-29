@@ -2,6 +2,7 @@
 
 from rpi_ws281x import Color, PixelStrip, ws
 import time
+import math
 
 # LED strip configuration:
 LED_COUNT = 300       # Number of LED pixels.
@@ -45,6 +46,9 @@ class correctColor:
 		return (((((color >> 16) & 0xff) * self.color_factor_r) // 0xff) << 16) | \
 		       (((((color >> 8) & 0xff)  * self.color_factor_g) // 0xff) << 8)  | \
 		       (((color & 0xff)          * self.color_factor_b) // 0xff)
+
+def gammaTable(gamma = 2.8, max_in = 255, max_out = 255):
+	return [int(math.pow(float(i) / float(max_in), gamma) * float(max_out) + 0.5) for i in range(256)]
 
 # Define functions which animate LEDs in various ways.
 def setColor(strip, color):

@@ -41,12 +41,14 @@ class LEDServerHandler:
 	def __init__(self):
 		self.strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
 		self.strip.begin()
+		self.setBrightness(MODE_FULL_BRIGHTNESS)
 		self.color = MODE_FULL_COLOR
 		self.skylight = SkyLight()
 
 	def setBrightness(self, brightness):
 		CHANNEL_NUM = 0
 		channel = ws.ws2811_channel_get(self.strip._leds, CHANNEL_NUM)
+		ws.ws2811_channel_t_gamma_set(channel, gammaTable(2.0))
 		ws.ws2811_channel_t_brightness_set(channel, brightness)
 
 	def modeFull(self):
