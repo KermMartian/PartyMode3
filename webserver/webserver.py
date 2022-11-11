@@ -9,6 +9,7 @@ LED_INTERFACE_PORT = 4237
 
 class LEDInterface:
     def __init__(self, port):
+        self.cur_solid_color='ffffff'    # Persistence
         self.socket = socket.socket()
         self.socket.connect((LOCALHOST, port))
 
@@ -26,7 +27,8 @@ class LEDInterface:
         elif action == 'off':
             self.socket.sendall(b'm0')
         elif action == 'color':
-            self.socket.sendall(b'c' + bytes(data['color'][-6:], 'ascii'))
+            self.cur_solid_color = data['color'][-6:]
+            self.socket.sendall(b'c' + bytes(self.cur_solid_color, 'ascii'))
         else:
             print("Skipping unknown action %s" % action)
 
@@ -66,24 +68,40 @@ class Partymode3Handler(BaseHTTPRequestHandler):
         """ do_GET() can be tested using curl command 
             'curl http://server-ip-address:port' 
         """
-        html = '''
-            <html>
-            <body style="width:960px; margin: 20px auto;">
-            <h1>Welcome to my Raspberry Pi</h1>
-            <form action="/" method="POST">
-                Mode:
-                <button type="submit" name="action" value="rainbow">Rainbow</button>
-                <button type="submit" name="action" value="christmas">Christmas</button>
-                <button type="submit" name="action" value="dim">Dim</button>
-                <button type="submit" name="action" value="full">Full</button>
-		<button type="submit" name="action" value="skylight">Sky Light</button>
-                <button type="submit" name="action" value="off">Off</button>
-                <input type="color" name="color" />
-                <button type="submit" name="action" value="color">Set Solid Color</button>
-            </form>
-            </body>
-            </html>
-        '''
+        if self.path != '/':
+            html = ''
+        else:
+            html = '''
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+ 		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+		<meta name="theme-color" content="#1a73e8">
+	</head>
+	<body class="text-center">
+		<h1>PartyMode 3.0</h1>
+		<form action="/" method="POST" class="container">
+			<div class="row">
+				<div class="col">
+					<button class="btn btn-lg btn-danger" type="submit" name="action" value="off">Off</button>
+					<button class="btn btn-lg btn-warning" type="submit" name="action" value="dim">Dim</button>
+					<button class="btn btn-lg btn-success" type="submit" name="action" value="full">Full</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<input class="btn btn-lg btn-secondary" type="color" name="color" value="#{0}" onchange="document.getElementById('change-color').click();" />
+					<button class="d-none" type="submit" name="action" id="change-color" value="color">Set Solid Color</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="rainbow">Rainbow</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="christmas">Christmas</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="skylight">Sky Light</button>
+				</div>
+			</div>
+		</form>
+	</body>
+</html>
+            '''.format(self.led_interface.cur_solid_color)
         self.do_HEAD()
         self.wfile.write(html.encode("utf-8"))
 
