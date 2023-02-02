@@ -44,6 +44,7 @@ class LEDServerHandler:
 		self.setBrightness(MODE_FULL_BRIGHTNESS)
 		self.color = MODE_FULL_COLOR
 		self.skylight = SkyLight()
+		self.mode = b'0'
 
 	def setBrightness(self, brightness):
 		CHANNEL_NUM = 0
@@ -115,6 +116,9 @@ class LEDServerHandler:
 					self.modeSkylight()
 				elif mode == b'0':
 					self.modeOff()
+
+				# Update stored mode
+				self.mode = mode
 			elif command == b'c':
 				self.color = correctColor()(int(str(await reader.read(6), encoding='ascii'), 16))
 				setColor(self.strip, self.color)
@@ -122,9 +126,18 @@ class LEDServerHandler:
 			else:
 				print("Unknown command %s" % command)
 
+	@staticmethod
+	async def updateLighting(self):
+		while True:
+			if self.mode == b's':
+				self.modeSkylight()
+			await asyncio.sleep(59)
+
 async def main():
 	ctx = LEDServerHandler()
 	server = await asyncio.start_server(ctx.handle_client, LOCALHOST, LED_INTERFACE_PORT)
+	loop = server.get_loop()
+	task = loop.create_task(LEDServerHandler.updateLighting(ctx), name='update')
 	async with server:
 		await server.serve_forever()
 
