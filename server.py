@@ -30,6 +30,13 @@ MODE_OFF_BRIGHTNESS = 0
 PROBABILITY_STAR_BRIGHT = 0.02
 PROBABILITY_STAR = 0.05
 
+# For Romantic mode
+CANDLESIM_RED_MAX = 40
+CANDLESIM_YELLOW_MAX = 88
+CANDLESIM_RESET_PROB = 0.075
+CANDLESIM_ADJUST_PROB = 0.3
+
+# For Christmas Light mode
 MODE_CHRISTMAS_FREQ = 4
 c9_red     = 0xae0202
 c9_orange  = 0xbf3803
@@ -95,6 +102,38 @@ class LEDServerHandler:
 				self.strip.setPixelColorRGB(i, r, g, b)
 		self.strip.show()
 
+	def modeRomantic(self):
+		self.cur_color_idx = (8 << 8) | 8;
+		self.modeRomanticUpdate(force = True)
+
+	def modeRomanticUpdate(self, force = False):
+		red    = (self.cur_color_idx >> 8) & 0xff;
+		yellow = (self.cur_color_idx & 0xff);
+
+		def updateRomanticColor(self, red, yellow):
+			self.cur_color_idx = (red << 8) | yellow
+			self.color = correctColor()( \
+			             ((16 + red + (yellow >> 1)) << 16) | \
+			             ((16 + (yellow >> 1)) << 8) | \
+			             8);
+			setColor(self.strip, self.color)
+			self.strip.show()
+
+		action_prob = random.random()
+		if CANDLESIM_RESET_PROB >= action_prob or force:
+			# Choose new colors
+			red = random.randint(0, CANDLESIM_RED_MAX);
+			yellow = random.randint(0, CANDLESIM_YELLOW_MAX);
+			updateRomanticColor(self, red, yellow)
+
+		elif CANDLESIM_ADJUST_PROB >= action_prob:
+			# Slightly adjust existing colors
+			if CANDLESIM_ADJUST_PROB / 2. >= action_prob:
+				red = max(min(red + random.choice((-1, 1)), CANDLESIM_RED_MAX - 1), 0)
+			else:
+				yellow = max(min(yellow + random.choice((-1, 1)), CANDLESIM_YELLOW_MAX - 1), 0)
+			updateRomanticColor(self, red, yellow)
+
 	def modeOff(self):
 		self.setBrightness(MODE_OFF_BRIGHTNESS)
 		self.strip.show()
@@ -112,6 +151,8 @@ class LEDServerHandler:
 					self.modeChristmas()
 				elif mode == b'a':
 					self.modeRainbow()
+				elif mode == b'r':
+					self.modeRomantic()
 				elif mode == b's':
 					self.modeSkylight()
 				elif mode == b'0':
@@ -131,7 +172,9 @@ class LEDServerHandler:
 		while True:
 			if self.mode == b's':
 				self.modeSkylight()
-			await asyncio.sleep(59)
+			elif self.mode == b'r':
+				self.modeRomanticUpdate()
+			await asyncio.sleep(0.1)
 
 async def main():
 	ctx = LEDServerHandler()

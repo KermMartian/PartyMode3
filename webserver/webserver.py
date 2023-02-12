@@ -16,6 +16,8 @@ class LEDInterface:
     def do(self, action, data):
         if action == 'rainbow':
             self.socket.sendall(b'ma')
+        elif action == 'romantic':
+            self.socket.sendall(b'mr')
         elif action == 'christmas':
             self.socket.sendall(b'mx')
         elif action == 'full':
@@ -94,6 +96,7 @@ class Partymode3Handler(BaseHTTPRequestHandler):
 					<input class="btn btn-lg btn-secondary" type="color" name="color" value="#{0}" onchange="document.getElementById('change-color').click();" />
 					<button class="d-none" type="submit" name="action" id="change-color" value="color">Set Solid Color</button>
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="rainbow">Rainbow</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="romantic">Romantic</button>
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="christmas">Christmas</button>
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="skylight">Sky Light</button>
 				</div>
