@@ -51,7 +51,10 @@ class LEDServerHandler:
 		self.setBrightness(MODE_FULL_BRIGHTNESS)
 		self.color = MODE_FULL_COLOR
 		self.skylight = SkyLight()
+
+		# Cache these separately so that brightness commands don't override the mode
 		self.mode = b'0'
+		self.brightness = b'0'
 
 	def setBrightness(self, brightness):
 		CHANNEL_NUM = 0
@@ -59,11 +62,11 @@ class LEDServerHandler:
 		ws.ws2811_channel_t_gamma_set(channel, gammaTable(2.0))
 		ws.ws2811_channel_t_brightness_set(channel, brightness)
 
-	def modeFull(self):
+	def brightnessFull(self):
 		self.setBrightness(MODE_FULL_BRIGHTNESS)
 		self.strip.show()
 	
-	def modeDim(self):
+	def brightnessDim(self):
 		self.setBrightness(MODE_DIM_BRIGHTNESS)
 		self.strip.show()
 	
@@ -143,11 +146,7 @@ class LEDServerHandler:
 			command = await reader.read(1)
 			if command == b'm':
 				mode = await reader.read(1)
-				if mode == b'f':                 # Full
-					self.modeFull()
-				elif mode == b'd':               # Dim
-					self.modeDim()
-				elif mode == b'x':
+				if mode == b'x':
 					self.modeChristmas()
 				elif mode == b'a':
 					self.modeRainbow()
@@ -160,6 +159,17 @@ class LEDServerHandler:
 
 				# Update stored mode
 				self.mode = mode
+
+			elif command == b'b':
+				brightness = await reader.read(1)
+				if brightness == b'f':                 # Full
+					self.brightnessFull()
+				elif brightness == b'd':               # Dim
+					self.brightnessDim()
+
+				# Update stored brightness
+				self.brightness = brightness
+
 			elif command == b'c':
 				self.color = correctColor()(int(str(await reader.read(6), encoding='ascii'), 16))
 				setColor(self.strip, self.color)

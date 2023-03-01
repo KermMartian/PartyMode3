@@ -21,9 +21,9 @@ class LEDInterface:
         elif action == 'christmas':
             self.socket.sendall(b'mx')
         elif action == 'full':
-            self.socket.sendall(b'mf')
+            self.socket.sendall(b'bf')
         elif action == 'dim':
-            self.socket.sendall(b'md')
+            self.socket.sendall(b'bd')
         elif action == 'skylight':
             self.socket.sendall(b'ms')
         elif action == 'off':
