@@ -44,6 +44,14 @@ c9_green   = 0x04600
 c9_blue    = 0x202069
 c9_colors = [c9_red, c9_orange, c9_green, c9_blue]
 
+# For Easter mode
+easter_blue = 0x7cecf8
+easter_violet = 0x8876eb
+easter_pink = 0xfe7f91
+easter_yellow = 0xfdd27f
+easter_green = 0x76eba7
+easter_colors = [easter_blue, easter_violet, easter_pink, easter_yellow, easter_green]
+
 class LEDServerHandler:
 	def __init__(self):
 		self.strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP)
@@ -70,6 +78,13 @@ class LEDServerHandler:
 		self.setBrightness(MODE_DIM_BRIGHTNESS)
 		self.strip.show()
 	
+	def modeEaster(self):
+		setColor(self.strip, 0x000000)
+		self.setBrightness(MODE_FULL_BRIGHTNESS)
+		for i in range(0, LED_COUNT):
+			self.strip.setPixelColor(i, easter_colors[(i * len(easter_colors)) // LED_COUNT])
+		self.strip.show()
+
 	def modeChristmas(self):
 		color_idx = 0
 		setColor(self.strip, 0x000000)
@@ -148,6 +163,8 @@ class LEDServerHandler:
 				mode = await reader.read(1)
 				if mode == b'x':
 					self.modeChristmas()
+				elif mode == b'e':
+					self.modeEaster()
 				elif mode == b'a':
 					self.modeRainbow()
 				elif mode == b'r':
