@@ -36,6 +36,41 @@ class ColorTemperature:
 	# 20000 Kelvin
 	ClearBlueSky = 0x409CFF   # 20000 K, 64, 156, 255
 
+# Get the color for a temperature
+def getWhite(temp):
+	temps = {
+		1900: ColorTemperature.Candle, \
+		2600: ColorTemperature.Tungsten40W, \
+		2850: ColorTemperature.Tungsten100W, \
+		3200: ColorTemperature.Halogen, \
+		5200: ColorTemperature.CarbonArc, \
+		5400: ColorTemperature.HighNoonSun, \
+		6000: ColorTemperature.DirectSunlight, \
+		7000: ColorTemperature.OvercastSky, \
+		20000: ColorTemperature.ClearBlueSky, \
+	}
+	temp_keys = sorted(temps.keys())
+	if temp < temp_keys[0]:
+		return temps[temp_keys[0]]
+	elif temp > temp_keys[-1]:
+		return temps[temp_keys[-1]]
+	else:
+		for i in range(len(temp_keys) - 1):
+			if temp >= temp_keys[i] and temp <= temp_keys[i + 1]:
+				c1 = temp_keys[i]
+				c2 = temp_keys[i + 1]
+				break
+		else:
+			# This should be impossible
+			return temps[temp_keys[-1]]
+
+	ratio = (temp - c1) / (c2 - c1)
+	c1 = temps[c1]
+	c2 = temps[c2]
+	channelCorrect = lambda ch1, ch2, ratio: int(float(ch2) * ratio + float(ch1) * (1.0 - ratio))
+	componentCorrect = lambda c1, c2, bit_offset, ratio: channelCorrect((c1 >> bit_offset) & 0x0ff, (c2 >> bit_offset) & 0x0ff, ratio) << bit_offset
+	return componentCorrect(c1, c2, 16, ratio) | componentCorrect(c1, c2, 8, ratio) | componentCorrect(c1, c2, 0, ratio)
+
 # Correct color balance
 class correctColor:
 	color_factor_r = (LED_PURE_WHITE_CORRECTION >> 16) & 0xff

@@ -33,6 +33,8 @@ class LEDInterface:
         elif action == 'color':
             self.cur_solid_color = data['color'][-6:]
             self.socket.sendall(b'c' + bytes(self.cur_solid_color, 'ascii'))
+        elif action.startswith('white'):
+            self.socket.sendall(b'w' + bytes('%05d' % int(action.split('-')[1]), 'ascii'))
         else:
             print("Skipping unknown action %s" % action)
 
@@ -86,14 +88,14 @@ class Partymode3Handler(BaseHTTPRequestHandler):
 	<body class="text-center">
 		<h1>PartyMode 3.0</h1>
 		<form action="/" method="POST" class="container">
-			<div class="row">
+			<div class="row pb-3">
 				<div class="col">
 					<button class="btn btn-lg btn-danger" type="submit" name="action" value="off">Off</button>
 					<button class="btn btn-lg btn-warning" type="submit" name="action" value="dim">Dim</button>
 					<button class="btn btn-lg btn-success" type="submit" name="action" value="full">Full</button>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row pb-3">
 				<div class="col">
 					<input class="btn btn-lg btn-secondary" type="color" name="color" value="#{0}" onchange="document.getElementById('change-color').click();" />
 					<button class="d-none" type="submit" name="action" id="change-color" value="color">Set Solid Color</button>
@@ -102,6 +104,19 @@ class Partymode3Handler(BaseHTTPRequestHandler):
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="christmas">Christmas</button>
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="easter">Easter</button>
 					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="skylight">Sky Light</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-1900">Candle</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-2600">Tungsten (40W)</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-2850">Tungsten (100W)</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-3200">Halogen</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-5200">Carbon Arc</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-5400">High Noon Sun</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-6000">Direct Sunlight</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-7000">Overcast Sky</button>
+					<button class="btn btn-lg btn-secondary" type="submit" name="action" value="white-20000">Clear Blue Sky</button>
 				</div>
 			</div>
 		</form>

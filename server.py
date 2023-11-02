@@ -187,6 +187,17 @@ class LEDServerHandler:
 				# Update stored brightness
 				self.brightness = brightness
 
+			elif command == b'w':
+				temperature = await reader.read(5)
+				try:
+					temperature = int(temperature.decode('ascii').lstrip('0'))
+				except ValueError:
+					temperature = 2900
+
+				self.color = getWhite(temperature)
+				setColor(self.strip, self.color)
+				self.strip.show()
+
 			elif command == b'c':
 				self.color = correctColor()(int(str(await reader.read(6), encoding='ascii'), 16))
 				setColor(self.strip, self.color)
