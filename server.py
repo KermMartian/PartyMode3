@@ -23,6 +23,7 @@ MODE_SKYLIGHT_COLOR_BRIGHTSTAR = 0xE0E0FF
 MODE_SKYLIGHT_COLOR_DIMSTAR = 0x404050
 
 MODE_FULL_BRIGHTNESS = 255
+MODE_MEDIUM_BRIGHTNESS = 128
 MODE_DIM_COLOR = 0x303030
 MODE_DIM_BRIGHTNESS = 64
 MODE_OFF_BRIGHTNESS = 0
@@ -72,6 +73,10 @@ class LEDServerHandler:
 
 	def brightnessFull(self):
 		self.setBrightness(MODE_FULL_BRIGHTNESS)
+		self.strip.show()
+
+	def brightnessMedium(self):
+		self.setBrightness(MODE_MEDIUM_BRIGHTNESS)
 		self.strip.show()
 	
 	def brightnessDim(self):
@@ -181,6 +186,8 @@ class LEDServerHandler:
 				brightness = await reader.read(1)
 				if brightness == b'f':                 # Full
 					self.brightnessFull()
+				elif brightness == b'm':               # Medium
+					self.brightnessMedium()
 				elif brightness == b'd':               # Dim
 					self.brightnessDim()
 

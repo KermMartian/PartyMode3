@@ -24,6 +24,8 @@ class LEDInterface:
             self.socket.sendall(b'me')
         elif action == 'full':
             self.socket.sendall(b'bf')
+        elif action == 'medium':
+            self.socket.sendall(b'bm')
         elif action == 'dim':
             self.socket.sendall(b'bd')
         elif action == 'skylight':
@@ -92,7 +94,8 @@ class Partymode3Handler(BaseHTTPRequestHandler):
 				<div class="col">
 					<button class="btn btn-lg btn-danger" type="submit" name="action" value="off">Off</button>
 					<button class="btn btn-lg btn-warning" type="submit" name="action" value="dim">Dim</button>
-					<button class="btn btn-lg btn-success" type="submit" name="action" value="full">Full</button>
+					<button class="btn btn-lg btn-success" type="submit" name="action" value="medium">Medium</button>
+					<button class="btn btn-lg btn-info" type="submit" name="action" value="full">Full</button>
 				</div>
 			</div>
 			<div class="row pb-3">
